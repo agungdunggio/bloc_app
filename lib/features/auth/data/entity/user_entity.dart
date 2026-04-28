@@ -1,4 +1,4 @@
-import '../../domain/model/user_model.dart';
+import 'package:bloc_state_management/features/auth/domain/model/user_model.dart';
 
 class UserEntity extends UserModel {
   const UserEntity({

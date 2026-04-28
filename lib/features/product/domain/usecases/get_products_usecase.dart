@@ -1,15 +1,18 @@
-import '../../../../core/usecase/usecase.dart';
-import '../entities/product_entity.dart';
-import '../repositories/product_repository.dart';
+import 'package:fpdart/fpdart.dart';
+
+import 'package:bloc_state_management/core/error/failure.dart';
+import 'package:bloc_state_management/core/usecase/usecase.dart';
+import 'package:bloc_state_management/features/product/domain/model/product_model.dart';
+import 'package:bloc_state_management/features/product/domain/interface/product_repository.dart';
 
 class GetProductsUseCase
-    implements UseCase<List<ProductEntity>, ProductParams> {
+    implements UseCase<Either<Failure, List<ProductModel>>, ProductParams> {
   const GetProductsUseCase(this._repository);
 
   final ProductRepository _repository;
 
   @override
-  Future<List<ProductEntity>> call(ProductParams params) {
+  Future<Either<Failure, List<ProductModel>>> call(ProductParams params) {
     return _repository.getProducts(
       limit: params.limit,
       skip: params.skip,

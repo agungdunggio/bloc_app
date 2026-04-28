@@ -3,26 +3,26 @@ part of 'product_bloc.dart';
 sealed class ProductState extends Equatable {
   const ProductState();
 
-  List<ProductEntity> get products;
+  List<ProductModel> get products;
   bool get isLoadingList;
   bool get isLoadingMore;
   bool get hasReachedMax;
   String get query;
   Failure? get listFailure;
-  ProductEntity? get selectedProduct;
-  List<ProductEntity> get recommendations;
+  ProductModel? get selectedProduct;
+  List<ProductModel> get recommendations;
   bool get isLoadingDetail;
   Failure? get detailFailure;
 
   ProductState copyWith({
-    List<ProductEntity>? products,
+    List<ProductModel>? products,
     bool? isLoadingList,
     bool? isLoadingMore,
     bool? hasReachedMax,
     String? query,
     Failure? listFailure,
-    ProductEntity? selectedProduct,
-    List<ProductEntity>? recommendations,
+    ProductModel? selectedProduct,
+    List<ProductModel>? recommendations,
     bool? isLoadingDetail,
     Failure? detailFailure,
     bool clearListFailure = false,
@@ -60,7 +60,7 @@ class ProductStateData extends ProductState {
   }
 
   @override
-  final List<ProductEntity> products;
+  final List<ProductModel> products;
   @override
   final bool isLoadingList;
   @override
@@ -72,9 +72,9 @@ class ProductStateData extends ProductState {
   @override
   final Failure? listFailure;
   @override
-  final ProductEntity? selectedProduct;
+  final ProductModel? selectedProduct;
   @override
-  final List<ProductEntity> recommendations;
+  final List<ProductModel> recommendations;
   @override
   final bool isLoadingDetail;
   @override
@@ -82,14 +82,14 @@ class ProductStateData extends ProductState {
 
   @override
   ProductStateData copyWith({
-    List<ProductEntity>? products,
+    List<ProductModel>? products,
     bool? isLoadingList,
     bool? isLoadingMore,
     bool? hasReachedMax,
     String? query,
     Failure? listFailure,
-    ProductEntity? selectedProduct,
-    List<ProductEntity>? recommendations,
+    ProductModel? selectedProduct,
+    List<ProductModel>? recommendations,
     bool? isLoadingDetail,
     Failure? detailFailure,
     bool clearListFailure = false,

@@ -1,7 +1,7 @@
-import '../../domain/entities/product_entity.dart';
+import 'package:bloc_state_management/features/product/domain/model/product_model.dart';
 
-class ProductModel extends ProductEntity {
-  const ProductModel({
+class ProductEntity extends ProductModel {
+  const ProductEntity({
     required super.id,
     required super.title,
     required super.description,
@@ -12,8 +12,8 @@ class ProductModel extends ProductEntity {
     required super.category,
   });
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) {
-    return ProductModel(
+  factory ProductEntity.fromJson(Map<String, dynamic> json) {
+    return ProductEntity(
       id: (json['id'] as num?)?.toInt() ?? 0,
       title: (json['title'] as String?) ?? '',
       description: (json['description'] as String?) ?? '',

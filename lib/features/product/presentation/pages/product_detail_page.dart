@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/product_bloc.dart';
-import '../widgets/product_card.dart';
+import 'package:bloc_state_management/features/product/presentation/bloc/product_bloc.dart';
+import 'package:bloc_state_management/features/product/presentation/widgets/product_card.dart';
 
 class ProductDetailPage extends StatefulWidget {
   const ProductDetailPage({super.key, required this.productId});

@@ -1,14 +1,17 @@
-import '../../../../core/usecase/usecase.dart';
-import '../model/user_model.dart';
-import '../repositories/auth_repository.dart';
+import 'package:fpdart/fpdart.dart';
 
-class LoginUseCase implements UseCase<UserModel, LoginParams> {
+import 'package:bloc_state_management/core/error/failure.dart';
+import 'package:bloc_state_management/core/usecase/usecase.dart';
+import 'package:bloc_state_management/features/auth/domain/model/user_model.dart';
+import 'package:bloc_state_management/features/auth/domain/interface/auth_repository.dart';
+
+class LoginUseCase implements UseCase<Either<Failure, UserModel>, LoginParams> {
   const LoginUseCase(this._repository);
 
   final AuthRepository _repository;
 
   @override
-  Future<UserModel> call(LoginParams params) {
+  Future<Either<Failure, UserModel>> call(LoginParams params) {
     return _repository.login(
       username: params.username,
       password: params.password,

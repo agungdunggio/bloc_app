@@ -4,12 +4,11 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-import '../../domain/model/user_model.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/logout_usecase.dart';
-import '../../../../core/error/failure.dart';
-import '../../../../core/usecase/usecase.dart';
+import 'package:bloc_state_management/features/auth/domain/model/user_model.dart';
+import 'package:bloc_state_management/features/auth/domain/usecases/login_usecase.dart';
+import 'package:bloc_state_management/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:bloc_state_management/core/error/failure.dart';
+import 'package:bloc_state_management/core/usecase/usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -18,10 +17,8 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
   AuthBloc({
     required LoginUseCase loginUseCase,
     required LogoutUseCase logoutUseCase,
-    required AuthRepository authRepository,
   }) : _loginUseCase = loginUseCase,
        _logoutUseCase = logoutUseCase,
-       _authRepository = authRepository,
        super(const AuthInitial()) {
     on<AuthStarted>(_onStarted);
     on<AuthLoginSubmitted>(_onLoginSubmitted, transformer: sequential());
@@ -30,7 +27,6 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
 
   final LoginUseCase _loginUseCase;
   final LogoutUseCase _logoutUseCase;
-  final AuthRepository _authRepository;
 
   String? get token => switch (state) {
     AuthAuthenticated(:final user) => user.token,
@@ -47,23 +43,24 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading());
-    try {
-      final user = await _loginUseCase(
-        LoginParams(username: event.username, password: event.password),
-      );
-      emit(AuthAuthenticated(user));
-    } catch (e) {
-      emit(AuthFailureState(_authRepository.mapExceptionToFailure(e)));
+    final result = await _loginUseCase(
+      LoginParams(username: event.username, password: event.password),
+    );
+    result.fold((failure) {
+      emit(AuthFailureState(failure));
       emit(const AuthUnauthenticated());
-    }
+    }, (user) => emit(AuthAuthenticated(user)));
   }
 
   Future<void> _onLogoutRequested(
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    await _logoutUseCase(const NoParams());
-    emit(const AuthUnauthenticated());
+    final result = await _logoutUseCase(const NoParams());
+    result.fold(
+      (failure) => emit(AuthFailureState(failure)),
+      (_) => emit(const AuthUnauthenticated()),
+    );
   }
 
   @override

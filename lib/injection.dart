@@ -5,13 +5,13 @@ import 'core/network/auth_token_provider.dart';
 import 'core/network/dio_client.dart';
 import 'features/auth/data/datasource/auth_remote_datasource.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
-import 'features/auth/domain/repositories/auth_repository.dart';
+import 'features/auth/domain/interface/auth_repository.dart';
 import 'features/auth/domain/usecases/login_usecase.dart';
 import 'features/auth/domain/usecases/logout_usecase.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/product/data/datasource/product_remote_datasource.dart';
 import 'features/product/data/repositories/product_repository_impl.dart';
-import 'features/product/domain/repositories/product_repository.dart';
+import 'features/product/domain/interface/product_repository.dart';
 import 'features/product/domain/usecases/get_product_detail_usecase.dart';
 import 'features/product/domain/usecases/get_products_usecase.dart';
 import 'features/product/domain/usecases/get_recommendations_usecase.dart';
@@ -32,10 +32,10 @@ Future<void> setupDependencies() async {
       ).dio,
     )
     ..registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRemoteDataSourceImpl(sl<Dio>()),
+      () => AuthRemoteDataSource(sl<Dio>()),
     )
     ..registerLazySingleton<ProductRemoteDataSource>(
-      () => ProductRemoteDataSourceImpl(sl<Dio>()),
+      () => ProductRemoteDataSource(sl<Dio>()),
     )
     ..registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(sl<AuthRemoteDataSource>()),
@@ -62,7 +62,6 @@ Future<void> setupDependencies() async {
       () => AuthBloc(
         loginUseCase: sl<LoginUseCase>(),
         logoutUseCase: sl<LogoutUseCase>(),
-        authRepository: sl<AuthRepository>(),
       ),
     )
     ..registerLazySingleton<ProductBloc>(
@@ -70,7 +69,6 @@ Future<void> setupDependencies() async {
         getProductsUseCase: sl<GetProductsUseCase>(),
         getProductDetailUseCase: sl<GetProductDetailUseCase>(),
         getRecommendationsUseCase: sl<GetRecommendationsUseCase>(),
-        productRepository: sl<ProductRepository>(),
       ),
     );
 

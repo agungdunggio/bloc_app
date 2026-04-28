@@ -1,8 +1,9 @@
-import 'package:bloc_state_management/core/error/exceptions.dart';
 import 'package:bloc_state_management/core/error/failure.dart';
+import 'package:bloc_state_management/core/error/error_mapper.dart';
 import 'package:bloc_state_management/features/auth/data/datasource/auth_remote_datasource.dart';
-import 'package:bloc_state_management/features/auth/domain/model/user_model.dart';
-import 'package:bloc_state_management/features/auth/domain/repositories/auth_repository.dart';
+import 'package:bloc_state_management/features/auth/data/entity/user_entity.dart';
+import 'package:bloc_state_management/features/auth/domain/interface/auth_repository.dart';
+import 'package:fpdart/fpdart.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl(this._remoteDataSource);
@@ -10,25 +11,21 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
 
   @override
-  Future<UserModel> login({
+  Future<Either<Failure, UserEntity>> login({
     required String username,
     required String password,
-  }) {
-    return _remoteDataSource.login(username: username, password: password);
+  }) async {
+    try {
+      final user = await _remoteDataSource.login(
+        username: username,
+        password: password,
+      );
+      return Right(user);
+    } catch (exception) {
+      return Left(mapExceptionToFailure(exception));
+    }
   }
 
   @override
-  Future<void> logout() async {
-    
-  }
-
-  @override
-  Failure mapExceptionToFailure(Object exception) {
-    return switch (exception) {
-      UnauthorizedException() => const UnauthorizedFailure(),
-      NetworkException() => const NetworkFailure(),
-      ServerException() => const ServerFailure(),
-      _ => const UnknownFailure(),
-    };
-  }
+  Future<Either<Failure, Unit>> logout() async => const Right(unit);
 }

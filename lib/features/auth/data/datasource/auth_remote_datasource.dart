@@ -1,18 +1,13 @@
 import 'package:dio/dio.dart';
 
 import 'package:bloc_state_management/core/error/exceptions.dart';
-import 'package:bloc_state_management/features/auth/data/models/user_entity.dart';
+import 'package:bloc_state_management/features/auth/data/entity/user_entity.dart';
 
-abstract interface class AuthRemoteDataSource {
-  Future<UserEntity> login({required String username, required String password});
-}
-
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  const AuthRemoteDataSourceImpl(this._dio);
+class AuthRemoteDataSource {
+  const AuthRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  @override
   Future<UserEntity> login({
     required String username,
     required String password,

@@ -1,27 +1,14 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/error/exceptions.dart';
-import '../models/product_model.dart';
+import 'package:bloc_state_management/core/error/exceptions.dart';
+import 'package:bloc_state_management/features/product/data/entities/product_entity.dart';
 
-abstract interface class ProductRemoteDataSource {
-  Future<List<ProductModel>> getProducts({
-    required int limit,
-    required int skip,
-    String? searchQuery,
-  });
-
-  Future<ProductModel> getProductDetail(int productId);
-
-  Future<List<ProductModel>> getRecommendations(String category);
-}
-
-class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
-  const ProductRemoteDataSourceImpl(this._dio);
+class ProductRemoteDataSource {
+  const ProductRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  @override
-  Future<List<ProductModel>> getProducts({
+  Future<List<ProductEntity>> getProducts({
     required int limit,
     required int skip,
     String? searchQuery,
@@ -40,7 +27,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       );
       final list = (response.data?['products'] as List<dynamic>?) ?? const [];
       return list
-          .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
+          .map((item) => ProductEntity.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionError ||
@@ -54,30 +41,28 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     }
   }
 
-  @override
-  Future<ProductModel> getProductDetail(int productId) async {
+  Future<ProductEntity> getProductDetail(int productId) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '/products/$productId',
       );
       final data = response.data;
       if (data == null) throw const ServerException('Empty response');
-      return ProductModel.fromJson(data);
+      return ProductEntity.fromJson(data);
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) throw const UnauthorizedException();
       throw const ServerException();
     }
   }
 
-  @override
-  Future<List<ProductModel>> getRecommendations(String category) async {
+  Future<List<ProductEntity>> getRecommendations(String category) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '/products/category/$category',
       );
       final list = (response.data?['products'] as List<dynamic>?) ?? const [];
       return list
-          .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
+          .map((item) => ProductEntity.fromJson(item as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) throw const UnauthorizedException();

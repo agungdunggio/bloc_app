@@ -1,8 +1,9 @@
-import '../../../../core/error/exceptions.dart';
-import '../../../../core/error/failure.dart';
-import '../../domain/entities/product_entity.dart';
-import '../../domain/repositories/product_repository.dart';
-import '../datasource/product_remote_datasource.dart';
+import 'package:bloc_state_management/core/error/error_mapper.dart';
+import 'package:bloc_state_management/core/error/failure.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:bloc_state_management/features/product/domain/model/product_model.dart';
+import 'package:bloc_state_management/features/product/domain/interface/product_repository.dart';
+import 'package:bloc_state_management/features/product/data/datasource/product_remote_datasource.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   const ProductRepositoryImpl(this._remoteDataSource);
@@ -10,39 +11,43 @@ class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDataSource _remoteDataSource;
 
   @override
-  Future<List<ProductEntity>> getProducts({
+  Future<Either<Failure, List<ProductModel>>> getProducts({
     required int limit,
     required int skip,
     String? searchQuery,
-  }) {
-    return _remoteDataSource.getProducts(
-      limit: limit,
-      skip: skip,
-      searchQuery: searchQuery,
-    );
+  }) async {
+    try {
+      final products = await _remoteDataSource.getProducts(
+        limit: limit,
+        skip: skip,
+        searchQuery: searchQuery,
+      );
+      return Right(products);
+    } catch (exception) {
+      return Left(mapExceptionToFailure(exception));
+    }
   }
 
   @override
-  Future<ProductEntity> getProductDetail(int productId) {
-    return _remoteDataSource.getProductDetail(productId);
+  Future<Either<Failure, ProductModel>> getProductDetail(int productId) async {
+    try {
+      final product = await _remoteDataSource.getProductDetail(productId);
+      return Right(product);
+    } catch (exception) {
+      return Left(mapExceptionToFailure(exception));
+    }
   }
 
   @override
-  Future<List<ProductEntity>> getRecommendations({
+  Future<Either<Failure, List<ProductModel>>> getRecommendations({
     required String category,
     required int excludeId,
   }) async {
-    final products = await _remoteDataSource.getRecommendations(category);
-    return products.where((item) => item.id != excludeId).toList();
-  }
-
-  @override
-  Failure mapExceptionToFailure(Object exception) {
-    return switch (exception) {
-      UnauthorizedException() => const UnauthorizedFailure(),
-      NetworkException() => const NetworkFailure(),
-      ServerException() => const ServerFailure(),
-      _ => const UnknownFailure(),
-    };
+    try {
+      final products = await _remoteDataSource.getRecommendations(category);
+      return Right(products.where((item) => item.id != excludeId).toList());
+    } catch (exception) {
+      return Left(mapExceptionToFailure(exception));
+    }
   }
 }
