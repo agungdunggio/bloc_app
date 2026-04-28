@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'package:bloc_state_management/core/error/exceptions.dart';
-import 'package:bloc_state_management/features/auth/data/entity/user_entity.dart';
+import 'package:bloc_state_management/features/auth/data/entities/user_entity.dart';
 
 class AuthRemoteDataSource {
   const AuthRemoteDataSource(this._dio);

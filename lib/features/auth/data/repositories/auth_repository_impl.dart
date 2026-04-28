@@ -1,7 +1,7 @@
 import 'package:bloc_state_management/core/error/failure.dart';
 import 'package:bloc_state_management/core/error/error_mapper.dart';
 import 'package:bloc_state_management/features/auth/data/datasource/auth_remote_datasource.dart';
-import 'package:bloc_state_management/features/auth/data/entity/user_entity.dart';
+import 'package:bloc_state_management/features/auth/data/entities/user_entity.dart';
 import 'package:bloc_state_management/features/auth/domain/interface/auth_repository.dart';
 import 'package:fpdart/fpdart.dart';
 

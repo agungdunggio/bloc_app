@@ -9,7 +9,6 @@ import 'package:bloc_state_management/core/error/failure.dart';
 import 'package:bloc_state_management/features/product/domain/model/product_model.dart';
 import 'package:bloc_state_management/features/product/domain/usecases/get_product_detail_usecase.dart';
 import 'package:bloc_state_management/features/product/domain/usecases/get_products_usecase.dart';
-import 'package:bloc_state_management/features/product/domain/usecases/get_recommendations_usecase.dart';
 
 part 'product_event.dart';
 part 'product_state.dart';
@@ -23,10 +22,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc({
     required GetProductsUseCase getProductsUseCase,
     required GetProductDetailUseCase getProductDetailUseCase,
-    required GetRecommendationsUseCase getRecommendationsUseCase,
   }) : _getProductsUseCase = getProductsUseCase,
        _getProductDetailUseCase = getProductDetailUseCase,
-       _getRecommendationsUseCase = getRecommendationsUseCase,
        super(const ProductInitial()) {
     on<ProductStarted>(_onStarted, transformer: restartable());
     on<ProductSearchChanged>(
@@ -45,7 +42,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   final GetProductsUseCase _getProductsUseCase;
   final GetProductDetailUseCase _getProductDetailUseCase;
-  final GetRecommendationsUseCase _getRecommendationsUseCase;
   ProductStateData get _data => ProductStateData.fromState(state);
 
   Future<void> _onStarted(
@@ -138,8 +134,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       recommendations: const [],
     );
     emit(ProductDetailLoading.fromData(loadingData));
-    final detailResult = await _getProductDetailUseCase(event.productId);
-    await detailResult.fold(
+    final result = await _getProductDetailUseCase(event.productId);
+    result.fold(
       (failure) async {
         final nextData = _data.copyWith(
           isLoadingDetail: false,
@@ -147,28 +143,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         );
         emit(ProductDetailError.fromData(nextData));
       },
-      (detail) async {
-        final recommendationsResult = await _getRecommendationsUseCase(
-          RecommendationParams(category: detail.category, excludeId: detail.id),
+      (detailResult) async {
+        final nextData = _data.copyWith(
+          isLoadingDetail: false,
+          selectedProduct: detailResult.detail,
+          recommendations: detailResult.recommendations.take(10).toList(),
+          clearDetailFailure: true,
         );
-        recommendationsResult.fold(
-          (failure) {
-            final nextData = _data.copyWith(
-              isLoadingDetail: false,
-              detailFailure: failure,
-            );
-            emit(ProductDetailError.fromData(nextData));
-          },
-          (recommendations) {
-            final nextData = _data.copyWith(
-              isLoadingDetail: false,
-              selectedProduct: detail,
-              recommendations: recommendations.take(10).toList(),
-              clearDetailFailure: true,
-            );
-            emit(ProductDetailLoaded.fromData(nextData));
-          },
-        );
+        emit(ProductDetailLoaded.fromData(nextData));
       },
     );
   }

@@ -14,7 +14,6 @@ import 'features/product/data/repositories/product_repository_impl.dart';
 import 'features/product/domain/interface/product_repository.dart';
 import 'features/product/domain/usecases/get_product_detail_usecase.dart';
 import 'features/product/domain/usecases/get_products_usecase.dart';
-import 'features/product/domain/usecases/get_recommendations_usecase.dart';
 import 'features/product/presentation/bloc/product_bloc.dart';
 
 final sl = GetIt.instance;
@@ -55,9 +54,6 @@ Future<void> setupDependencies() async {
     ..registerLazySingleton<GetProductDetailUseCase>(
       () => GetProductDetailUseCase(sl<ProductRepository>()),
     )
-    ..registerLazySingleton<GetRecommendationsUseCase>(
-      () => GetRecommendationsUseCase(sl<ProductRepository>()),
-    )
     ..registerLazySingleton<AuthBloc>(
       () => AuthBloc(
         loginUseCase: sl<LoginUseCase>(),
@@ -68,7 +64,6 @@ Future<void> setupDependencies() async {
       () => ProductBloc(
         getProductsUseCase: sl<GetProductsUseCase>(),
         getProductDetailUseCase: sl<GetProductDetailUseCase>(),
-        getRecommendationsUseCase: sl<GetRecommendationsUseCase>(),
       ),
     );
 
