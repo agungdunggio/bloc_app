@@ -1,3 +1,4 @@
+import 'package:bloc_state_management/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -21,6 +22,18 @@ class _ProductListPageState extends State<ProductListPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final state = context.read<ProductBloc>().state;
+      final shouldLoadInitial =
+          state.products.isEmpty &&
+          !state.isLoadingList &&
+          state.listFailure == null &&
+          state.query.isEmpty;
+      if (shouldLoadInitial) {
+        context.read<ProductBloc>().add(const ProductStarted());
+      }
+    });
   }
 
   @override
@@ -102,8 +115,12 @@ class _ProductListPageState extends State<ProductListPage> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) =>
-                                ProductDetailPage(productId: product.id),
+                            builder: (context) {
+                              return BlocProvider<ProductBloc>(
+                                create: (_) => sl<ProductBloc>(),
+                                child: ProductDetailPage(productId: product.id),
+                              );
+                            },
                           ),
                         );
                       },

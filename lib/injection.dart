@@ -60,7 +60,7 @@ Future<void> setupDependencies() async {
         logoutUseCase: sl<LogoutUseCase>(),
       ),
     )
-    ..registerLazySingleton<ProductBloc>(
+    ..registerFactory<ProductBloc>(
       () => ProductBloc(
         getProductsUseCase: sl<GetProductsUseCase>(),
         getProductDetailUseCase: sl<GetProductDetailUseCase>(),

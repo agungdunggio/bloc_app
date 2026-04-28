@@ -1,3 +1,4 @@
+import 'package:bloc_state_management/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -80,10 +81,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           child: ProductCard(
                             product: recommendation,
                             onTap: () {
-                              Navigator.of(context).pushReplacement(
+                              Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => ProductDetailPage(
-                                    productId: recommendation.id,
+                                  builder: (_) => BlocProvider<ProductBloc>(
+                                    create: (_) => sl<ProductBloc>(),
+                                    child: ProductDetailPage(
+                                      productId: recommendation.id,
+                                    ),
                                   ),
                                 ),
                               );
