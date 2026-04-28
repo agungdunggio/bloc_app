@@ -24,7 +24,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     required GetProductDetailUseCase getProductDetailUseCase,
   }) : _getProductsUseCase = getProductsUseCase,
        _getProductDetailUseCase = getProductDetailUseCase,
-       super(const ProductInitial()) {
+       super(const ProductState()) {
     on<ProductStarted>(_onStarted, transformer: restartable());
     on<ProductSearchChanged>(
       _onSearchChanged,
@@ -42,19 +42,18 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   final GetProductsUseCase _getProductsUseCase;
   final GetProductDetailUseCase _getProductDetailUseCase;
-  ProductStateData get _data => ProductStateData.fromState(state);
 
   Future<void> _onStarted(
     ProductStarted event,
     Emitter<ProductState> emit,
   ) async {
-    final nextData = _data.copyWith(
+    final nextData = state.copyWith(
       isLoadingList: true,
       clearListFailure: true,
       hasReachedMax: false,
       products: const [],
     );
-    emit(ProductListLoading.fromData(nextData));
+    emit(nextData);
     await _loadProducts(emit: emit, append: false);
   }
 
@@ -62,14 +61,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     ProductSearchChanged event,
     Emitter<ProductState> emit,
   ) async {
-    final nextData = _data.copyWith(
+    final nextData = state.copyWith(
       query: event.query,
       isLoadingList: true,
       clearListFailure: true,
       hasReachedMax: false,
       products: const [],
     );
-    emit(ProductListLoading.fromData(nextData));
+    emit(nextData);
     await _loadProducts(emit: emit, append: false);
   }
 
@@ -80,11 +79,11 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     if (state.hasReachedMax || state.isLoadingMore || state.isLoadingList) {
       return;
     }
-    final nextData = _data.copyWith(
+    final nextData = state.copyWith(
       isLoadingMore: true,
       clearListFailure: true,
     );
-    emit(ProductListLoading.fromData(nextData));
+    emit(nextData);
     await _loadProducts(emit: emit, append: true);
   }
 
@@ -102,23 +101,23 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
     result.fold(
       (failure) {
-        final nextData = _data.copyWith(
+        final nextData = state.copyWith(
           isLoadingList: false,
           isLoadingMore: false,
           listFailure: failure,
         );
-        emit(ProductListError.fromData(nextData));
+        emit(nextData);
       },
       (products) {
         final merged = append ? [...state.products, ...products] : products;
-        final nextData = _data.copyWith(
+        final nextData = state.copyWith(
           products: merged,
           isLoadingList: false,
           isLoadingMore: false,
           hasReachedMax: products.length < _pageSize,
           clearListFailure: true,
         );
-        emit(ProductListLoaded.fromData(nextData));
+        emit(nextData);
       },
     );
   }
@@ -127,30 +126,30 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     ProductDetailRequested event,
     Emitter<ProductState> emit,
   ) async {
-    final loadingData = _data.copyWith(
+    final loadingData = state.copyWith(
       isLoadingDetail: true,
       clearDetailFailure: true,
       selectedProduct: null,
       recommendations: const [],
     );
-    emit(ProductDetailLoading.fromData(loadingData));
+    emit(loadingData);
     final result = await _getProductDetailUseCase(event.productId);
     result.fold(
       (failure) async {
-        final nextData = _data.copyWith(
+        final nextData = state.copyWith(
           isLoadingDetail: false,
           detailFailure: failure,
         );
-        emit(ProductDetailError.fromData(nextData));
+        emit(nextData);
       },
       (detailResult) async {
-        final nextData = _data.copyWith(
+        final nextData = state.copyWith(
           isLoadingDetail: false,
           selectedProduct: detailResult.detail,
           recommendations: detailResult.recommendations.take(10).toList(),
           clearDetailFailure: true,
         );
-        emit(ProductDetailLoaded.fromData(nextData));
+        emit(nextData);
       },
     );
   }
@@ -159,6 +158,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     ProductResetRequested event,
     Emitter<ProductState> emit,
   ) {
-    emit(const ProductInitial());
+    emit(const ProductState());
   }
 }

@@ -1,18 +1,29 @@
 part of 'product_bloc.dart';
 
-sealed class ProductState extends Equatable {
-  const ProductState();
+final class ProductState extends Equatable {
+  const ProductState({
+    this.products = const [],
+    this.isLoadingList = false,
+    this.isLoadingMore = false,
+    this.hasReachedMax = false,
+    this.query = '',
+    this.listFailure,
+    this.selectedProduct,
+    this.recommendations = const [],
+    this.isLoadingDetail = false,
+    this.detailFailure,
+  });
 
-  List<ProductModel> get products;
-  bool get isLoadingList;
-  bool get isLoadingMore;
-  bool get hasReachedMax;
-  String get query;
-  Failure? get listFailure;
-  ProductModel? get selectedProduct;
-  List<ProductModel> get recommendations;
-  bool get isLoadingDetail;
-  Failure? get detailFailure;
+  final List<ProductModel> products;
+  final bool isLoadingList;
+  final bool isLoadingMore;
+  final bool hasReachedMax;
+  final String query;
+  final Failure? listFailure;
+  final ProductModel? selectedProduct;
+  final List<ProductModel> recommendations;
+  final bool isLoadingDetail;
+  final Failure? detailFailure;
 
   ProductState copyWith({
     List<ProductModel>? products,
@@ -27,75 +38,8 @@ sealed class ProductState extends Equatable {
     Failure? detailFailure,
     bool clearListFailure = false,
     bool clearDetailFailure = false,
-  });
-}
-
-class ProductStateData extends ProductState {
-  const ProductStateData({
-    this.products = const [],
-    this.isLoadingList = false,
-    this.isLoadingMore = false,
-    this.hasReachedMax = false,
-    this.query = '',
-    this.listFailure,
-    this.selectedProduct,
-    this.recommendations = const [],
-    this.isLoadingDetail = false,
-    this.detailFailure,
-  });
-
-  factory ProductStateData.fromState(ProductState state) {
-    return ProductStateData(
-      products: state.products,
-      isLoadingList: state.isLoadingList,
-      isLoadingMore: state.isLoadingMore,
-      hasReachedMax: state.hasReachedMax,
-      query: state.query,
-      listFailure: state.listFailure,
-      selectedProduct: state.selectedProduct,
-      recommendations: state.recommendations,
-      isLoadingDetail: state.isLoadingDetail,
-      detailFailure: state.detailFailure,
-    );
-  }
-
-  @override
-  final List<ProductModel> products;
-  @override
-  final bool isLoadingList;
-  @override
-  final bool isLoadingMore;
-  @override
-  final bool hasReachedMax;
-  @override
-  final String query;
-  @override
-  final Failure? listFailure;
-  @override
-  final ProductModel? selectedProduct;
-  @override
-  final List<ProductModel> recommendations;
-  @override
-  final bool isLoadingDetail;
-  @override
-  final Failure? detailFailure;
-
-  @override
-  ProductStateData copyWith({
-    List<ProductModel>? products,
-    bool? isLoadingList,
-    bool? isLoadingMore,
-    bool? hasReachedMax,
-    String? query,
-    Failure? listFailure,
-    ProductModel? selectedProduct,
-    List<ProductModel>? recommendations,
-    bool? isLoadingDetail,
-    Failure? detailFailure,
-    bool clearListFailure = false,
-    bool clearDetailFailure = false,
   }) {
-    return ProductStateData(
+    return ProductState(
       products: products ?? this.products,
       isLoadingList: isLoadingList ?? this.isLoadingList,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
@@ -124,170 +68,4 @@ class ProductStateData extends ProductState {
     isLoadingDetail,
     detailFailure,
   ];
-}
-
-final class ProductInitial extends ProductStateData {
-  const ProductInitial();
-}
-
-final class ProductListLoading extends ProductStateData {
-  const ProductListLoading({
-    required super.products,
-    required super.hasReachedMax,
-    required super.query,
-    required super.selectedProduct,
-    required super.recommendations,
-    required super.detailFailure,
-    required super.isLoadingDetail,
-    super.isLoadingMore = false,
-    super.listFailure,
-  }) : super(isLoadingList: true);
-
-  factory ProductListLoading.fromData(ProductStateData data) {
-    return ProductListLoading(
-      products: data.products,
-      isLoadingMore: data.isLoadingMore,
-      hasReachedMax: data.hasReachedMax,
-      query: data.query,
-      listFailure: data.listFailure,
-      selectedProduct: data.selectedProduct,
-      recommendations: data.recommendations,
-      isLoadingDetail: data.isLoadingDetail,
-      detailFailure: data.detailFailure,
-    );
-  }
-}
-
-final class ProductListLoaded extends ProductStateData {
-  const ProductListLoaded({
-    required super.products,
-    required super.isLoadingMore,
-    required super.hasReachedMax,
-    required super.query,
-    required super.selectedProduct,
-    required super.recommendations,
-    required super.isLoadingDetail,
-    required super.detailFailure,
-  }) : super(isLoadingList: false, listFailure: null);
-
-  factory ProductListLoaded.fromData(ProductStateData data) {
-    return ProductListLoaded(
-      products: data.products,
-      isLoadingMore: data.isLoadingMore,
-      hasReachedMax: data.hasReachedMax,
-      query: data.query,
-      selectedProduct: data.selectedProduct,
-      recommendations: data.recommendations,
-      isLoadingDetail: data.isLoadingDetail,
-      detailFailure: data.detailFailure,
-    );
-  }
-}
-
-final class ProductListError extends ProductStateData {
-  const ProductListError({
-    required super.products,
-    required super.isLoadingMore,
-    required super.hasReachedMax,
-    required super.query,
-    required super.listFailure,
-    required super.selectedProduct,
-    required super.recommendations,
-    required super.isLoadingDetail,
-    required super.detailFailure,
-  }) : super(isLoadingList: false);
-
-  factory ProductListError.fromData(ProductStateData data) {
-    return ProductListError(
-      products: data.products,
-      isLoadingMore: data.isLoadingMore,
-      hasReachedMax: data.hasReachedMax,
-      query: data.query,
-      listFailure: data.listFailure,
-      selectedProduct: data.selectedProduct,
-      recommendations: data.recommendations,
-      isLoadingDetail: data.isLoadingDetail,
-      detailFailure: data.detailFailure,
-    );
-  }
-}
-
-final class ProductDetailLoading extends ProductStateData {
-  const ProductDetailLoading({
-    required super.products,
-    required super.isLoadingList,
-    required super.isLoadingMore,
-    required super.hasReachedMax,
-    required super.query,
-    required super.listFailure,
-    super.selectedProduct,
-    super.recommendations = const [],
-  }) : super(isLoadingDetail: true);
-
-  factory ProductDetailLoading.fromData(ProductStateData data) {
-    return ProductDetailLoading(
-      products: data.products,
-      isLoadingList: data.isLoadingList,
-      isLoadingMore: data.isLoadingMore,
-      hasReachedMax: data.hasReachedMax,
-      query: data.query,
-      listFailure: data.listFailure,
-      selectedProduct: data.selectedProduct,
-      recommendations: data.recommendations,
-    );
-  }
-}
-
-final class ProductDetailLoaded extends ProductStateData {
-  const ProductDetailLoaded({
-    required super.products,
-    required super.isLoadingList,
-    required super.isLoadingMore,
-    required super.hasReachedMax,
-    required super.query,
-    required super.listFailure,
-    required super.selectedProduct,
-    required super.recommendations,
-  }) : super(isLoadingDetail: false, detailFailure: null);
-
-  factory ProductDetailLoaded.fromData(ProductStateData data) {
-    return ProductDetailLoaded(
-      products: data.products,
-      isLoadingList: data.isLoadingList,
-      isLoadingMore: data.isLoadingMore,
-      hasReachedMax: data.hasReachedMax,
-      query: data.query,
-      listFailure: data.listFailure,
-      selectedProduct: data.selectedProduct,
-      recommendations: data.recommendations,
-    );
-  }
-}
-
-final class ProductDetailError extends ProductStateData {
-  const ProductDetailError({
-    required super.products,
-    required super.isLoadingList,
-    required super.isLoadingMore,
-    required super.hasReachedMax,
-    required super.query,
-    required super.listFailure,
-    required super.selectedProduct,
-    required super.recommendations,
-    required super.detailFailure,
-  }) : super(isLoadingDetail: false);
-
-  factory ProductDetailError.fromData(ProductStateData data) {
-    return ProductDetailError(
-      products: data.products,
-      isLoadingList: data.isLoadingList,
-      isLoadingMore: data.isLoadingMore,
-      hasReachedMax: data.hasReachedMax,
-      query: data.query,
-      listFailure: data.listFailure,
-      selectedProduct: data.selectedProduct,
-      recommendations: data.recommendations,
-      detailFailure: data.detailFailure,
-    );
-  }
 }
