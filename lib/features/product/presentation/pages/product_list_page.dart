@@ -1,4 +1,4 @@
-import 'package:bloc_state_management/injection.dart';
+// import 'package:bloc_state_management/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -115,12 +115,8 @@ class _ProductListPageState extends State<ProductListPage> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) {
-                              return BlocProvider<ProductBloc>(
-                                create: (_) => sl<ProductBloc>(),
-                                child: ProductDetailPage(productId: product.id),
-                              );
-                            },
+                            builder: (_) =>
+                                ProductDetailPage(productId: product.id),
                           ),
                         );
                       },
